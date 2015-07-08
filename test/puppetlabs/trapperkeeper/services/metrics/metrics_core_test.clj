@@ -1,6 +1,7 @@
 (ns puppetlabs.trapperkeeper.services.metrics.metrics-core-test
   (:import (com.codahale.metrics MetricRegistry JmxReporter))
   (:require [clojure.test :refer :all]
+            [metrics.core]
             [puppetlabs.trapperkeeper.services.metrics.metrics-core :refer :all]
             [schema.test :as schema-test]))
 
@@ -14,6 +15,10 @@
     (let [context (initialize {:enabled true :server-id "localhost"})]
       (is (instance? MetricRegistry (:registry context)))
       (is (not (contains? context :jmx-reporter)))))
+  (testing "uses metrics-clojure default registry if configured to do so"
+    (let [context (initialize {:enabled true :server-id "localhost" :use-metrics-clojure true})]
+      (is (instance? MetricRegistry (:registry context)))
+      (is (= metrics.core/default-registry (:registry context)))))
   (testing "enables jmx reporter if configured to do so"
     (let [context (initialize {:enabled true
                                :server-id "localhost"
